@@ -41,6 +41,7 @@ namespace TheFeels {
 
             // make texture and add it.
             //x,y,w,h (these are incorrect)
+            // TODO: move this to Hero's definition. can get at the entity e.g. FeelsTileGroup onAddedToEntity
             var hitBox = new BoxCollider(-8, -8, 16, 32);
             //var hitBox = new BoxCollider(16, 32);
             heroEntity.addComponent(hitBox);
@@ -69,19 +70,17 @@ namespace TheFeels {
             healthBarEntity.addComponent(feelsBadHealthBarComponent);
             healthBarEntity.addComponent(feeslGoodHealthBarComponent);
 
-            //FeelsTile testTile = new FeelsTile(new Vector2(spawnObject.x, spawnObject.y + 20), GameManager.FeelsType.Good);
+            var testTileGroupEnt = myScene.createEntity("test-tile-group", new Vector2(spawnObject.X, spawnObject.Y + 20));
+            byte [,]map = {
+                { 1, 1, 1 },
+                { 0, 1, 0 },
+                { 0, 1, 0 },
+                { 1, 1, 1 },
+            };
 
-            var testTileEntity = myScene.createEntity("test-tile", new Vector2(spawnObject.X, spawnObject.Y + 20));
-
-            //testTileEntity.tag = GameManager.Tags.FeelsGoodTile;
-
-            FeelsTile testTileComponent = new FeelsTile(new Vector2(0,0), GameManager.FeelsTileType.FeelsGood);
-            //testTileEntity.addComponent(new BoxCollider(spawnObject.X, spawnObject.Y + 20, 16, 16));
-            testTileEntity.addComponent(new BoxCollider(0, 0, 16, 16));
-            //testTileEntity.addComponent(new BoxCollider(16,16));
-
-            //testTileEntity.addComponent(new Mover());
-            testTileEntity.addComponent(testTileComponent);
+            FeelsTileGroup feelsTileGroupComponent = new FeelsTileGroup(map, GameManager.FeelsTileType.FeelsBad);
+            testTileGroupEnt.tag = (int)GameManager.FeelsTileType.FeelsBad;
+            testTileGroupEnt.addComponent(feelsTileGroupComponent);
 
             //myScene.addPostProcessor(new VignettePostProcessor(1));
             Core.debugRenderEnabled = true;

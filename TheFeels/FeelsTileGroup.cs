@@ -29,23 +29,77 @@ namespace TheFeels {
 
     // a FeelsRoom class could be a "map" of descendants of this class...
     // an a level could be an arrangement of rooms...
-    public class FeelsTileGroup {
-        protected GameManager.FeelsTileType[,] _tiles;
+    public class FeelsTileGroup :  Nez.RenderableComponent, Nez.IUpdatable, Nez.ITriggerListener {
+        protected FeelsTile[,] _tiles;
         protected int _rows;
         protected int _cols;
+        protected int _tileWidth = 16;
+        protected int _tileHeight = 16;
+        protected Vector2 _entityOffset;
 
         public FeelsTileGroup(int rows, int cols) {
             Rows = rows;
             Cols = cols;
-            _tiles = new GameManager.FeelsTileType[Rows, Cols];
+            _tiles = new FeelsTile[Rows, Cols];
         }
 
-        public void SetTileAt(int r, int c, GameManager.FeelsTileType type) {
+        public FeelsTileGroup(byte[,] map, GameManager.FeelsTileType ft) {
+            // TODO: make sure its not jagged
+            if (map.Rank != 2) {
+                throw new Exception("FeelsTileGroup::FeelsTileGroup map must have rank 2 and be un-jagged");
+            }
+
+            var rows = map.GetLength(0);
+            var cols = map.GetLength(1);
+
+            _tiles = new FeelsTile[rows, cols];
+
+            for (int i=0; i<rows; i++) {
+                for (int j=0; j<cols; j++) {
+                    if (map[i,j] == 0) {
+                        _tiles[i, j] = new FeelsTile(new Vector2(-1, -1), GameManager.FeelsTileType.FeelsNothing);
+
+                    } else {
+                        _tiles[i, j] = new FeelsTile(new Vector2(_tileWidth * j, _tileHeight * i), ft);
+
+                    }
+                }
+            }
+        }
+
+        public void SetTileAt(int r, int c, FeelsTile tile) {
             if (! (r < Rows) && (c < Cols)) {
                 throw new Exception(String.Format("FeelsTileGroup::SetTileAt {0}, {1} out of bounds", r, c));
             }
 
-            _tiles[r,c] = type;
+            _tiles[r,c] = tile;
+        }
+
+        public override float width { get { return TotalWidth; } }
+        public override float height { get { return TotalHeight; } }
+
+        public int TotalWidth {
+            get {
+                return TileWidth * Cols;
+            }
+        }
+
+        public int TotalHeight {
+            get {
+                return TileHeight * Rows;
+            }
+        }
+
+        public int TileWidth {
+            get {
+                return _tileWidth;
+            }
+        }
+
+        public int TileHeight {
+            get {
+                return _tileHeight;
+            }
         }
 
         public int Rows {
@@ -68,13 +122,58 @@ namespace TheFeels {
             }
         }
 
-        public GameManager.FeelsTileType[,] Tiles {
+        public FeelsTile[,] Tiles {
             get {
                 return _tiles;
             }
 
             protected set {
                 _tiles = value;
+            }
+        }
+
+        public override void onAddedToEntity() {
+            float xOffset = entity.localPosition.X;
+            float yOffset = entity.localPosition.Y;
+            _entityOffset = new Vector2((int)xOffset, (int)yOffset);
+
+            var rows = _tiles.GetLength(0);
+            var cols = _tiles.GetLength(1);
+
+            for (int i = 0; i < rows; i++) {
+                for (int j=0; j<cols; j++) {
+                    if (Tiles[i,j].Type == GameManager.FeelsTileType.FeelsNothing) {
+                        continue;
+                    }
+
+                    FeelsTile someTile = _tiles[i, j];
+                    Rectangle someRect = someTile.Rect;
+                    entity.addComponent<BoxCollider>(new BoxCollider(someRect));
+                }
+            }
+        }
+
+        void IUpdatable.update() { }
+        void Nez.ITriggerListener.onTriggerEnter(Collider other, Collider self) { }
+        void Nez.ITriggerListener.onTriggerExit(Collider other, Collider self) { }
+
+        public override void render(Graphics graphics, Camera camera) {
+            var rows = _tiles.GetLength(0);
+            var cols = _tiles.GetLength(1);
+
+            for (int i=0; i<rows; i++) {
+                for (int j=0; j<cols; j++) {
+                    if (Tiles[i,j].Type == GameManager.FeelsTileType.FeelsNothing) {
+                        continue;
+                    }
+
+                    FeelsTile someTile = _tiles[i, j];
+                    Rectangle someRect = someTile.Rect;
+                    float fillOffsetX = someRect.X + _entityOffset.X;
+                    float fillOffsetY = someRect.Y + _entityOffset.Y;
+
+                    graphics.batcher.drawRect(new Rectangle((int)fillOffsetX, (int)fillOffsetY, (int)someRect.Width, someRect.Height), someTile.FillColor);
+                }
             }
         }
     }

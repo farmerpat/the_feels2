@@ -97,16 +97,18 @@ namespace TheFeels {
 
             if (currentCollision.collider != null) {
                 //System.Diagnostics.Debug.WriteLine("fyf");
-                if (currentCollision.collider.entity.tag == (int)GameManager.Tags.FeelsGoodTile) {
+                if (currentCollision.collider.entity.tag == (int)GameManager.FeelsTileType.FeelsGood) {
                     // (corposethumb)
-                    //System.Diagnostics.Debug.WriteLine("do stuff w/ feelsgoodtile");
+                    System.Diagnostics.Debug.WriteLine("do stuff w/ feelsgoodtile");
+                    /*
                     foreach (var tile in currentCollision.collider.entity.getComponents<FeelsTile>()) {
                         tile.increaseColor();
                         //System.Diagnostics.Debug.WriteLine("do stuff w/ feelsgoodtile");
 
                     }
+                    */
 
-                } else if (currentCollision.collider.entity.tag == (int)GameManager.Tags.FeelsBadTile) {
+                } else if (currentCollision.collider.entity.tag == (int)GameManager.FeelsTileType.FeelsBad) {
                     System.Diagnostics.Debug.WriteLine("do stuff w/ feelsbadtile");
 
                 }
