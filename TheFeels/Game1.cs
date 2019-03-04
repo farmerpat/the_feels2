@@ -71,11 +71,14 @@ namespace TheFeels {
             healthBarEntity.addComponent(feeslGoodHealthBarComponent);
 
             var testTileGroupEnt = myScene.createEntity("test-tile-group", new Vector2(spawnObject.X, spawnObject.Y + 20));
+
             byte [,]map = {
-                { 1, 1, 1 },
-                { 0, 1, 0 },
-                { 0, 1, 0 },
-                { 1, 1, 1 },
+                { 1, 1, 1, 1, 1, 1 },
+                { 0, 0, 1, 1, 0, 0 },
+                { 0, 0, 1, 1, 0, 0 },
+                { 0, 0, 1, 1, 0, 0 },
+                { 0, 0, 1, 1, 0, 0 },
+                { 1, 1, 1, 1, 1, 1 },
             };
 
             FeelsTileGroup feelsTileGroupComponent = new FeelsTileGroup(map, GameManager.FeelsTileType.FeelsBad);

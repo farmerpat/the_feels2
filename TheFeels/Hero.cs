@@ -18,10 +18,9 @@ using Nez;
 namespace TheFeels {
     //class Hero : Nez.Component, Nez.ITriggerListener, Nez.IUpdateable {
     class Hero : Nez.Component, Nez.IUpdatable, Nez.ITriggerListener {
-        protected float _moveSpeed = 150;
-        //protected float _gravity = 1000;
+        protected float _moveSpeed = 1;
         protected float _gravity = 2;
-        protected float _jumpHeight = 16 * 5;
+        protected float _jumpHeight = 0.5f;
         protected float _feelsGoodHealth = 50.0f;
         protected float _feelsGoodMaxHealth = 100.0f;
         protected float _feelsBadHealth = 50.0f;
@@ -85,9 +84,9 @@ namespace TheFeels {
                 _velocity.X = 0;
             }
 
-            if (_collisionState.below && _jumpButton.isPressed) {
-                _velocity.Y = (float)-Math.Sqrt(2.0f * _jumpHeight * _gravity);
-            }
+            //if (_collisionState.below && _jumpButton.isPressed) {
+                //_velocity.Y = (float)-Math.Sqrt(2.0f * _jumpHeight * _gravity);
+            //}
 
             _velocity.Y += _gravity * Nez.Time.deltaTime;
 
@@ -115,12 +114,23 @@ namespace TheFeels {
 
                 if (currentCollision.normal.Y == -1) {
                     _velocity.Y = 0;
+
+                    if (_jumpButton.isPressed) {
+                        _velocity.Y = (float)-Math.Sqrt(2.0f * _jumpHeight * _gravity);
+                    }
+                } else if (currentCollision.normal.Y == 1) {
+                    _velocity.Y = 0;
+
                 }
+            } else {
+                // add gravity to the _velocity.Y
+                //_velocity.Y += _gravity;
+                //_velocity.Y += _gravity * Nez.deltaTime;
             }
 
-            if (_collisionState.below) {
-                _velocity.Y = 0;
-            }
+            //if (_collisionState.below) {
+            //    _velocity.Y = 0;
+            //}
 
             // update the health bars
             //via   _feelsGoodHealth and _feelsBadHealth... how to get at health bar components?
